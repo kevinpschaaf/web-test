@@ -6,6 +6,9 @@
   <pre id="info"></pre>
   <div id="test"></div>
   <script>
+    window.onerror = function(e) {
+      log('Uncaught error:', e);
+    }
     function log() {
       info.textContent += [].slice.call(arguments).map(function(s) {
         return typeof s == 'object' ? JSON.stringify(s) : s || 'undefined';
