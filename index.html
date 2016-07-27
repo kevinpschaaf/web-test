@@ -4,7 +4,7 @@
 </head>
 <body>
 
-  <h4>Ver: 5</h4>
+  <h4>Ver: 6</h4>
   <pre id="info"></pre>
   <div id="test"></div>
 
@@ -75,20 +75,20 @@
             var html;
             delete proto.innerHTML;
             html = this.innerHTML;
-            if (html == undefined) {
+            if (html == undefined || html.indexOf('Before')>=0) {
               log('*** delete failed ***');
               Object.defineProperty(proto, 'innerHTML', pd);
               html = this.innerHTML;
             }
-            if (html == undefined) {
+            if (html == undefined || html.indexOf('Before')>=0) {
               log('*** defineProperty failed ***');
               delete pd.value;
               Object.defineProperty(proto, 'innerHTML', pd);
               html = this.innerHTML;
             }
-            if (html == undefined) {
+            if (html == undefined || html.indexOf('Before')>=0) {
               log('*** defineProperty w/ delete value failed ***');
-              html = '*** innerHTML.get failed ***';
+              html = html || '*** innerHTML.get failed ***';
             }
             patch(proto, pd);
             return html;
