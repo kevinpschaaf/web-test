@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+</head>
+<body>
+  <pre id="info"></pre>
+  <div id="test"></div>
+  <script>
+    function log() {
+      info.textContent += [].slice.call(arguments).map(function(s) {
+        return typeof s == 'object' ? JSON.stringify(s) : s || 'undefined';
+      }).join(' ') + '\n';
+      console.log.apply(console, arguments);
+    }
+    test.innerHTML = '<span style="color:red;">Before</span>';
+    var proto = HTMLElement.prototype;
+    var pd = Object.getOwnPropertyDescriptor(proto, 'innerHTML') ||
+    log('HTMLElement.prototype.innerHTML:', pd);
+    if (!pd) {
+      proto = Element.prototype;
+      pd = Object.getOwnPropertyDescriptor(proto, 'innerHTML');
+      log('Element.prototype.innerHTML:', pd);
+    }
+    log('descriptor properties', Object.getOwnPropertyNames(pd));
+    var set = pd.set;
+    log('innerHTML.set:', set || undefined);
+    var get = pd.get;
+    log('innerHTML.get:', set || undefined);
+
+    var div, frag;
+    if (!set || !get) {
+      var iframe = document.createElement('iframe');
+      document.body.appendChild(iframe);
+      div = iframe.contentDocument.createElement('div');
+      document.body.removeChild(iframe);
+      frag = document.createDocumentFragment();
+    }
+
+    if (!pd.configurable) {
+      proto = HTMLElement.prototype;
+    }
+    try {
+      Object.defineProperty(proto, 'innerHTML', {
+        configurable: pd.configurable,
+        enumerable: pd.enumerable,
+        get: get,
+        set: function(value) {
+          try {
+            if (set) {
+              log('---setter called! (native) ---');
+              set.apply(this, arguments);
+            } else {
+              log('---setter called! (iframe) ---');
+              div.innerHTML = value;
+              while (div.firstChild) {
+                frag.appendChild(div.firstChild);
+              }
+              this.innerText = '';
+              this.appendChild(frag);
+            }
+          } catch (e) {
+            log('Error in setter:', e);
+          }
+        }
+      })
+    } catch (e) {
+      log('Error in defineProperty:', e);
+    }
+    test.innerHTML = '<span style="color:green;">After</span>';
+  </script>
+</body>
+</html>
