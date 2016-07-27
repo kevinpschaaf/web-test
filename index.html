@@ -3,39 +3,53 @@
 <head>
 </head>
 <body>
-  <h4>Ver: 2</h4>
+
+  <h4>Ver: 3</h4>
   <pre id="info"></pre>
   <div id="test"></div>
+
   <script>
+
     window.onerror = function(e) {
       log('Uncaught error:', e);
     }
+
     function log() {
       info.textContent += [].slice.call(arguments).map(function(s) {
         return typeof s == 'object' ? JSON.stringify(s) : s || 'undefined';
       }).join(' ') + '\n';
       console.log.apply(console, arguments);
     }
+
     test.innerHTML = '<span style="color:red;">Before</span>';
+
+    // Is innerHTML defined on HTMLElement?
     var proto = HTMLElement.prototype;
     var pd = Object.getOwnPropertyDescriptor(proto, 'innerHTML') ||
     log('HTMLElement.prototype.innerHTML:', pd);
+
+    // Is innerHTML defined on Element?
     if (!pd) {
       proto = Element.prototype;
       pd = Object.getOwnPropertyDescriptor(proto, 'innerHTML');
       log('Element.prototype.innerHTML:', pd);
     }
+
+    // Is innerHTML defined on instance?
     if (!pd) {
       proto = test;
       pd = Object.getOwnPropertyDescriptor(proto, 'innerHTML');
       log('<div> instance.innerHTML:', pd);
     }
+
+    // What's in the descriptor for innerHTML?
     log('descriptor properties', Object.getOwnPropertyNames(pd));
     var set = pd.set;
     log('innerHTML.set:', set || undefined);
     var get = pd.get;
     log('innerHTML.get:', set || undefined);
 
+    // If we don't have callable accessors, get them from an iframe
     var div, frag;
     if (!set || !get) {
       var iframe = document.createElement('iframe');
@@ -45,14 +59,18 @@
       frag = document.createDocumentFragment();
     }
 
+    // If innerHTML is defined on Element but not configurable,
+    // go up to HTMLElement to patch it
     if (!pd.configurable) {
       proto = HTMLElement.prototype;
     }
+
+    // Try patching
     try {
       Object.defineProperty(proto, 'innerHTML', {
         configurable: pd.configurable,
         enumerable: pd.enumerable,
-        get: get,
+        get: get, // punt on getter for now
         set: function(value) {
           try {
             if (set) {
@@ -60,6 +78,7 @@
               set.apply(this, arguments);
             } else {
               log('---setter called! (iframe) ---');
+              // Fallback for innerHTML
               div.innerHTML = value;
               while (div.firstChild) {
                 frag.appendChild(div.firstChild);
@@ -75,7 +94,10 @@
     } catch (e) {
       log('Error in defineProperty:', e);
     }
+
+    // See if patching worked (should show "---setter called!---" and green "After")
     test.innerHTML = '<span style="color:green;">After</span>';
+
   </script>
 </body>
 </html>
