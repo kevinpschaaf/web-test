@@ -3,7 +3,7 @@
 <head>
 </head>
 <body>
-  <h4>Ver: 1</h4>
+  <h4>Ver: 2</h4>
   <pre id="info"></pre>
   <div id="test"></div>
   <script>
@@ -26,7 +26,7 @@
       log('Element.prototype.innerHTML:', pd);
     }
     if (!pd) {
-      proto = document.createElement('div');
+      proto = test;
       pd = Object.getOwnPropertyDescriptor(proto, 'innerHTML');
       log('<div> instance.innerHTML:', pd);
     }
