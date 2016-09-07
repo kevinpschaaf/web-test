@@ -4,11 +4,24 @@
 </head>
 <body>
 
-  <h4>Ver: 6</h4>
+  <h4>Ver: 7</h4>
   <pre id="info"></pre>
   <div id="test"></div>
+  <h4>Capabilities:</h4>
+  <pre id="capabilities"></pre>
 
   <script>
+
+    var m, wm, mo;
+    capabilities.textContent =
+      'URL: ' + Boolean(window.URL) + ', ' +
+        (window.URL ? new URL(window.location.href).href : '') + '\n' +
+      'Map: ' + Boolean(window.Map) + ', ' +
+        (window.Map ? (m=new Map(), m.set(this, 'works'), m.get(this)) : '' ) + '\n' +
+      'WeakMap: ' + Boolean(window.WeakMap) + ', ' +
+        (window.WeakMap ? (wm=new WeakMap(), wm.set(this, 'works'), wm.get(this)) : '' ) + '\n' +
+      'MutationObserver: ' + Boolean(window.MutationObserver) + ', ' +
+        (window.MutationObserver ? (mo=new MutationObserver(function(){}), mo.observe) : '' );
 
     window.onerror = function(e) {
       log('Uncaught error:', e);
