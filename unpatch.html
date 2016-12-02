@@ -4,7 +4,7 @@
 </head>
 <body>
 
-  <h4>Ver: 1</h4>
+  <h4>Ver: 2</h4>
   <h4>Capabilities:</h4>
   <pre id="info"></pre>
   <h4>Patched element:</h4>
@@ -63,10 +63,12 @@
     // See if setter patching worked (should show "---setter called!---" and green "After")
     test.innerHTML = '<span style="color:green;">After</span>';
     log('read innerHTML:', test.innerHTML);
+    test.textContent = 'Changed1';
 
     Object.defineProperty(test, 'innerHTML', pd);
+    log('read innerHTML:', test.innerHTML);
 
-    // See if getter patching worked
+    test.textContent = 'Changed2';
     log('read innerHTML:', test.innerHTML);
 
   </script>
